@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理后台 — 嵌入式学习笔记</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .dashboard { max-width: 960px; margin: 0 auto; padding: 28px 20px; }
+    .dash-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .dash-header h1 { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 700; color: var(--text); }
+    .dash-actions { display: flex; gap: 8px; }
+
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); padding: 20px;
+      box-shadow: var(--glass-shadow);
+    }
+    .stat-card .stat-num {
+      font-family: var(--font-serif); font-size: 2rem; font-weight: 700;
+      color: var(--seal); line-height: 1.2;
+    }
+    .stat-card .stat-label { font-size: .76rem; color: var(--text-dim); margin-top: 2px; }
+
+    .panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md); padding: 20px;
+      box-shadow: var(--glass-shadow); margin-bottom: 16px;
+    }
+    .panel h3 {
+      font-size: .8rem; font-weight: 600; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: .06em;
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    th { text-align: left; padding: 6px 10px; font-size: .7rem; color: var(--text-dim); font-weight: 600;
+         border-bottom: 1px solid var(--border); }
+    td { padding: 7px 10px; color: var(--text-muted); border-bottom: 1px solid var(--border-light); }
+    tr:hover td { background: var(--bg-subtle); }
+    .time-col { white-space: nowrap; color: var(--text-dim); font-size: .76rem; }
+    .ip-col { font-family: var(--font-mono); font-size: .74rem; }
+
+    .post-mgmt-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid var(--border-light);
+    }
+    .post-mgmt-item:last-child { border-bottom: none; }
+    .post-mgmt-item .pm-title { font-weight: 600; color: var(--text); font-size: .9rem; }
+    .post-mgmt-item .pm-meta { font-size: .72rem; color: var(--text-dim); }
+    .post-mgmt-item .pm-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+    .btn-sm {
+      padding: 4px 12px; font-size: .74rem; border-radius: var(--radius-sm);
+      cursor: pointer; font-family: var(--font-sans); border: 1px solid var(--border);
+      background: var(--bg-card); color: var(--text-muted);
+      transition: all .15s;
+    }
+    .btn-sm:hover { border-color: var(--seal); color: var(--seal); }
+    .btn-sm.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+    .badge {
+      display: inline-block; padding: 1px 8px; border-radius: var(--radius-full);
+      font-size: .68rem; font-weight: 600;
+    }
+    .badge-get { background: rgba(59,130,246,.1); color: #3B82F6; }
+
+    .empty-note { text-align: center; padding: 30px; color: var(--text-dim); font-size: .84rem; }
+
+    @media (max-width: 640px) {
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .dash-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body class="page-editor">
+<canvas id="codeRain" aria-hidden="true"></canvas>
+<canvas id="inkParticles" aria-hidden="true"></canvas>
+
+<nav class="navbar">
+  <div class="logo"><span>&#21360;</span> 管理后台</div>
+  <div class="nav-actions">
+    <button onclick="toggleTheme()" class="theme-btn" aria-label="切换主题">&#9711;</button>
+    <a href="index.html" style="font-size:.84rem;color:var(--text-muted);text-decoration:none;padding:6px 12px;">← 首页</a>
+    <button class="btn-write" onclick="location.href='editor.html'">写文章</button>
+  </div>
+</nav>
+
+<div class="dashboard">
+  <div class="dash-header">
+    <h1>管理后台</h1>
+    <div class="dash-actions">
+      <button class="btn-primary" onclick="location.href='editor.html'">写文章</button>
+      <button class="btn-secondary" onclick="location.href='index.html'">查看首页</button>
+    </div>
+  </div>
+
+  <!-- 统计卡片 -->
+  <div class="stat-grid" id="statGrid">
+    <div class="stat-card"><div class="stat-num">-</div><div class="stat-label">总访问量</div></div>
+    <div class="stat-card"><div class="stat-num">-</div><div class="stat-label">今日访问</div></div>
+    <div class="stat-card"><div class="stat-num">-</div><div class="stat-label">独立访客</div></div>
+    <div class="stat-card"><div class="stat-num">-</div><div class="stat-label">文章总数</div></div>
+  </div>
+
+  <!-- 最近访问 -->
+  <div class="panel">
+    <h3>最近访问</h3>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>时间</th><th>IP</th><th>页面</th><th>浏览器</th><th>系统</th></tr></thead>
+        <tbody id="visitTable"><tr><td colspan="5" class="empty-note">加载中...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 文章管理 -->
+  <div class="panel">
+    <h3>文章管理</h3>
+    <div id="postMgmt"><div class="empty-note">加载中...</div></div>
+  </div>
+
+  <!-- 个人信息 -->
+  <div class="panel">
+    <h3>个人信息</h3>
+    <div id="profileForm">
+      <div class="field" style="margin-bottom:10px;">
+        <label>昵称</label>
+        <input type="text" id="pfNickname" placeholder="你的昵称" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);">
+      </div>
+      <div class="field" style="margin-bottom:10px;">
+        <label>简介</label>
+        <input type="text" id="pfBio" placeholder="一句话介绍" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="field"><label>GitHub</label><input type="text" id="pfGithub" placeholder="用户名" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);"></div>
+        <div class="field"><label>邮箱</label><input type="text" id="pfEmail" placeholder="example@mail.com" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);"></div>
+      </div>
+      <button class="btn-primary" onclick="saveProfile()">保存个人信息</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  // 管理员检查
+  if (!sessionStorage.getItem('blog_admin_token')) {
+    location.href = 'admin.html';
+  }
+
+  const token = sessionStorage.getItem('blog_admin_token');
+  const authHeaders = {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': 'application/json'
+  };
+
+  async function loadDashboard() {
+    try {
+      const res = await fetch('/api/stats', { headers: authHeaders });
+      if (!res.ok) throw new Error('加载失败');
+      const stats = await res.json();
+
+      // 统计卡片
+      document.getElementById('statGrid').innerHTML = `
+        <div class="stat-card"><div class="stat-num">${stats.total}</div><div class="stat-label">总访问量</div></div>
+        <div class="stat-card"><div class="stat-num">${stats.today}</div><div class="stat-label">今日访问</div></div>
+        <div class="stat-card"><div class="stat-num">${stats.unique_ips}</div><div class="stat-label">独立访客</div></div>
+        <div class="stat-card"><div class="stat-num">${stats.posts_count}</div><div class="stat-label">文章总数</div></div>
+      `;
+
+      // 最近访问表
+      const recent = stats.recent || [];
+      if (recent.length === 0) {
+        document.getElementById('visitTable').innerHTML = '<tr><td colspan="5" class="empty-note">暂无访问记录</td></tr>';
+      } else {
+        document.getElementById('visitTable').innerHTML = recent.reverse().map(v => `
+          <tr>
+            <td class="time-col">${new Date(v.time).toLocaleString('zh-CN')}</td>
+            <td class="ip-col">${v.ip}</td>
+            <td><span class="badge badge-get">${v.path}</span></td>
+            <td>${v.browser}</td>
+            <td>${v.os}</td>
+          </tr>
+        `).join('');
+      }
+    } catch(e) {
+      document.getElementById('statGrid').innerHTML = '<div class="stat-card" style="grid-column:1/-1;"><div class="stat-label" style="color:var(--danger);">加载失败</div></div>';
+    }
+
+    // 文章管理
+    loadPosts();
+
+    // 个人信息
+    loadProfile();
+  }
+
+  async function loadPosts() {
+    try {
+      const res = await fetch('/api/posts');
+      const posts = await res.json();
+      const container = document.getElementById('postMgmt');
+
+      if (posts.length === 0) {
+        container.innerHTML = '<div class="empty-note">暂无文章</div>';
+        return;
+      }
+
+      container.innerHTML = posts.map(p => `
+        <div class="post-mgmt-item">
+          <div>
+            <div class="pm-title">${escapeHtml(p.title)}</div>
+            <div class="pm-meta">${p.category} · ${new Date(p.createdAt).toLocaleDateString('zh-CN')} · ${p.tags.join(', ')} ${p.pinned ? '· 置顶' : ''}</div>
+          </div>
+          <div class="pm-actions">
+            <button class="btn-sm" onclick="location.href='editor.html?edit=${p.id}'">编辑</button>
+            <button class="btn-sm danger" onclick="delPost(${p.id})">删除</button>
+          </div>
+        </div>
+      `).join('');
+    } catch(e) {
+      document.getElementById('postMgmt').innerHTML = '<div class="empty-note" style="color:var(--danger);">加载失败</div>';
+    }
+  }
+
+  async function loadProfile() {
+    try {
+      const res = await fetch('/api/profile');
+      const p = await res.json();
+      document.getElementById('pfNickname').value = p.nickname || '';
+      document.getElementById('pfBio').value = p.bio || '';
+      document.getElementById('pfGithub').value = p.github || '';
+      document.getElementById('pfEmail').value = p.email || '';
+    } catch(e) {}
+  }
+
+  async function saveProfile() {
+    const profile = {
+      nickname: document.getElementById('pfNickname').value.trim() || '嵌入式爱好者',
+      bio: document.getElementById('pfBio').value.trim() || '',
+      avatar: '',
+      github: document.getElementById('pfGithub').value.trim(),
+      email: document.getElementById('pfEmail').value.trim(),
+      bilibili: ''
+    };
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT', headers: authHeaders,
+        body: JSON.stringify(profile)
+      });
+      if (res.ok) { alert('已保存'); }
+    } catch(e) { alert('保存失败'); }
+  }
+
+  async function delPost(id) {
+    if (!confirm('确定删除这篇文章？')) return;
+    try {
+      await fetch('/api/posts/' + id, { method: 'DELETE', headers: authHeaders });
+      loadPosts();
+      alert('已删除');
+    } catch(e) { alert('删除失败'); }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // 导航栏中"管理"按钮变为"后台"
+  const adminBtn = document.querySelector('.navbar .logo span');
+  if (adminBtn) adminBtn.textContent = '⚙';
+
+  // 主题
+  (function() {
+    const saved = localStorage.getItem('blog_theme');
+    if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  })();
+
+  loadDashboard();
+</script>
+</body>
+</html>

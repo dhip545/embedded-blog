@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>嵌入式学习笔记 — 个人博客</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body>
+
+<!-- 需求8：代码雨 Canvas — 嵌入式字符飘落背景 -->
+<canvas id="codeRain" aria-hidden="true"></canvas>
+
+<!-- 墨水粒子 Canvas — 墨滴扩散上浮 -->
+<canvas id="inkParticles" aria-hidden="true"></canvas>
+
+<!-- ===== 导航栏 ===== -->
+<nav class="navbar">
+  <div class="logo"><span>&#21360;</span> 嵌入式学习笔记</div>
+  <div class="nav-actions">
+    <button onclick="openSettings()" class="theme-btn admin-only" title="设置" aria-label="设置" style="display:none;">&#8690;</button>
+    <button onclick="toggleTheme()" class="theme-btn" title="切换主题" aria-label="切换主题">&#9711;</button>
+    <button class="btn-write" id="btnAdmin" onclick="location.href='admin.html'">管理</button>
+    <button class="btn-write admin-only" onclick="location.href='dashboard.html'" style="display:none;">后台</button>
+  </div>
+</nav>
+
+<!-- ===== 主体 ===== -->
+<div class="container">
+  <div class="layout">
+
+    <main>
+      <div id="profileCard"></div>
+      <div id="postList"></div>
+    </main>
+
+    <aside class="sidebar">
+      <div id="sidebarProfile"></div>
+
+      <div class="sidebar-section">
+        <h3>分类</h3>
+        <div id="categoryFilter"></div>
+      </div>
+      <div class="sidebar-section">
+        <h3>标签</h3>
+        <div id="tagCloud" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+      </div>
+
+      <!-- 需求12：归档时间轴 -->
+      <div class="archive-section">
+        <h3>归档</h3>
+        <div class="archive-timeline" id="archiveTimeline"></div>
+      </div>
+
+      <!-- 墨点装饰 -->
+      <div class="ink-dots"><span></span><span></span><span></span><span></span><span></span></div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- 需求10：CPU 芯片装饰 — 纯 CSS 绘制，右下角固定 -->
+<div class="cpu-decoration" aria-hidden="true"></div>
+
+<!-- 水墨山峦背景 -->
+<div class="ink-mountains" aria-hidden="true"></div>
+
+<!-- 角落水墨装饰 -->
+<div class="corner-ink corner-ink--tl" aria-hidden="true"></div>
+<div class="corner-ink corner-ink--br" aria-hidden="true"></div>
+
+<!-- ===== 文章详情 Modal ===== -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal-content ink-reveal">
+    <button class="modal-close" onclick="closeModal()" aria-label="关闭">&times;</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ===== 个人信息详情弹窗（访客只读） ===== -->
+<div class="modal-overlay" id="profileDetailModal">
+  <div class="modal-content ink-reveal" style="max-width:520px;">
+    <button class="modal-close" onclick="closeProfileDetail()" aria-label="关闭">&times;</button>
+    <div id="profileDetailBody"></div>
+  </div>
+</div>
+
+<!-- ===== 设置弹窗 ===== -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-box">
+    <h3>个人设置</h3>
+    <div class="field">
+      <label for="setNickname">昵称</label>
+      <input type="text" id="setNickname" placeholder="你的昵称...">
+    </div>
+    <div class="field">
+      <label for="setBio">个人简介</label>
+      <input type="text" id="setBio" placeholder="一句话介绍自己...">
+    </div>
+    <div class="field">
+      <label for="setAvatar">头像 URL（可选）</label>
+      <input type="text" id="setAvatar" placeholder="https://... 留空使用默认">
+    </div>
+    <div class="field">
+      <label for="setGithub">GitHub（可选）</label>
+      <input type="text" id="setGithub" placeholder="用户名 或 完整链接">
+    </div>
+    <div class="field">
+      <label for="setEmail">邮箱（可选）</label>
+      <input type="text" id="setEmail" placeholder="example@mail.com">
+    </div>
+    <div class="field">
+      <label for="setBilibili">B站（可选）</label>
+      <input type="text" id="setBilibili" placeholder="UID 或 主页链接">
+    </div>
+
+    <hr class="settings-divider">
+
+    <div style="font-size:.72rem;color:var(--text-dim);margin-bottom:8px;">
+      重置将清除所有数据，恢复为示例文章
+    </div>
+
+    <div class="settings-actions">
+      <button class="btn-secondary" onclick="closeSettings()">取消</button>
+      <button class="btn-danger" onclick="resetAllData()">重置数据</button>
+      <button class="btn-primary" onclick="saveSettings()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 确认弹窗 ===== -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3>确认删除</h3>
+    <p>删除后无法恢复，确定要删除吗？</p>
+    <div class="confirm-actions">
+      <button class="btn-secondary" onclick="cancelDelete()">取消</button>
+      <button class="btn-danger" onclick="confirmDelete()">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Toast ===== -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

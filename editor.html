@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>写文章 — 嵌入式学习笔记</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+</head>
+<body class="page-editor">
+
+<!-- 需求8：代码雨 Canvas — 编辑页也展示 -->
+<canvas id="codeRain" aria-hidden="true"></canvas>
+<canvas id="inkParticles" aria-hidden="true"></canvas>
+
+<nav class="navbar">
+  <div class="logo"><span>&#21360;</span> 嵌入式学习笔记</div>
+  <div class="nav-actions">
+    <button onclick="toggleTheme()" class="theme-btn" aria-label="切换主题">&#9711;</button>
+    <button onclick="location.href='index.html'">← 首页</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-header">
+    <h1 id="editorTitle">写文章</h1>
+    <div class="subtitle">支持 Markdown · Ctrl+S 快速保存</div>
+  </div>
+
+  <div class="editor-meta">
+    <div>
+      <label for="postTitle">标题</label>
+      <input type="text" id="postTitle" placeholder="输入文章标题...">
+    </div>
+    <div>
+      <label for="postCategory">分类</label>
+      <select id="postCategory">
+        <option value="学习笔记">学习笔记</option>
+        <option value="问题记录">问题记录</option>
+        <option value="项目分析">项目分析</option>
+        <option value="经验总结">经验总结</option>
+        <option value="其他">其他</option>
+      </select>
+    </div>
+    <div style="grid-column:1/-1;">
+      <label for="postTags">标签（逗号分隔）</label>
+      <input type="text" id="postTags" placeholder="STM32, I2C, 驱动">
+    </div>
+    <div style="grid-column:1/-1;" class="pin-check">
+      <input type="checkbox" id="postPinned">
+      <label for="postPinned">置顶这篇文章</label>
+    </div>
+  </div>
+
+  <div class="editor-layout">
+    <div class="editor-pane">
+      <h3>编辑</h3>
+      <textarea id="editor" placeholder="使用 Markdown 书写...
+
+## 标题
+正文内容..."></textarea>
+      <div class="char-count" id="charCount">0 字 / 0 词</div>
+    </div>
+    <div class="preview-pane">
+      <h3>预览</h3>
+      <div id="preview"></div>
+    </div>
+  </div>
+
+  <div class="editor-actions">
+    <button class="btn-secondary" onclick="location.href='index.html'">取消</button>
+    <button class="btn-primary btn-write" onclick="savePost()">保存</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="js/app.js"></script>
+<script>
+  marked.use({ breaks: true, gfm: true });
+
+  // 管理员检查：未登录则跳转登录页
+  if (!sessionStorage.getItem('blog_admin_token')) {
+    location.href = 'admin.html';
+  }
+
+  const urlParams = new URLSearchParams(location.search);
+  const editId = urlParams.get('edit'); // 字符串
+
+  if (editId) {
+    document.getElementById('editorTitle').textContent = '编辑文章';
+    const posts = JSON.parse(localStorage.getItem('blog_posts') || '[]');
+    // 修复: String(p.id) === editId 确保类型匹配
+    const post = posts.find(p => String(p.id) === editId);
+    if (post) {
+      document.getElementById('postTitle').value = post.title;
+      document.getElementById('postCategory').value = post.category;
+      document.getElementById('postTags').value = post.tags.join(', ');
+      document.getElementById('postPinned').checked = !!post.pinned;
+      document.getElementById('editor').value = post.content;
+      updatePreview();
+    }
+  }
+
+  const editorEl = document.getElementById('editor');
+  editorEl.addEventListener('input', function() {
+    updatePreview();
+    document.getElementById('charCount').textContent =
+      editorEl.value.length + ' 字 / ' + editorEl.value.trim().split(/\s+/).filter(Boolean).length + ' 词';
+  });
+
+  function updatePreview() {
+    const html = marked.parse(editorEl.value || '*输入内容后这里显示预览...*');
+    document.getElementById('preview').innerHTML = html;
+    document.querySelectorAll('#preview pre code').forEach(b => hljs.highlightElement(b));
+  }
+  updatePreview();
+  document.getElementById('charCount').textContent =
+    editorEl.value.length + ' 字 / ' + editorEl.value.trim().split(/\s+/).filter(Boolean).length + ' 词';
+
+  // Ctrl+S 保存
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      savePost();
+    }
+  });
+
+  async function savePost() {
+    const title = document.getElementById('postTitle').value.trim();
+    const content = document.getElementById('editor').value.trim();
+    const category = document.getElementById('postCategory').value;
+    const tags = document.getElementById('postTags').value.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+    const pinned = document.getElementById('postPinned').checked;
+    if (!title) { alert('请输入标题'); return; }
+    if (!content) { alert('请输入内容'); return; }
+
+    let posts = JSON.parse(localStorage.getItem('blog_posts') || '[]');
+    const now = new Date().toISOString();
+    let savedPost = null;
+
+    if (editId) {
+      const idx = posts.findIndex(p => String(p.id) === editId);
+      if (idx > -1) {
+        posts[idx] = { ...posts[idx], title, content, category, tags, pinned, updatedAt: now };
+        savedPost = posts[idx];
+      }
+    } else {
+      savedPost = {
+        id: Date.now(),
+        title, content, category, tags, pinned,
+        createdAt: now,
+        updatedAt: now
+      };
+      posts.unshift(savedPost);
+    }
+
+    localStorage.setItem('blog_posts', JSON.stringify(posts));
+
+    // 同步到服务端
+    if (isAdmin()) {
+      try {
+        if (editId) {
+          await apiUpdatePost(savedPost);
+        } else {
+          await apiSavePost(savedPost);
+        }
+      } catch(e) { console.log('服务端同步失败:', e); }
+    }
+
+    alert('保存成功');
+    setTimeout(() => { location.href = 'index.html'; }, 300);
+  }
+
+  // 检查管理员状态
+  function isAdmin() {
+    return !!sessionStorage.getItem('blog_admin_token');
+  }
+  async function apiUpdatePost(post) {
+    const token = sessionStorage.getItem('blog_admin_token');
+    const res = await fetch('/api/posts/' + post.id, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(post)
+    });
+    if (!res.ok) throw new Error('更新失败');
+    return res.json();
+  }
+  async function apiSavePost(post) {
+    const token = sessionStorage.getItem('blog_admin_token');
+    const res = await fetch('/api/posts', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(post)
+    });
+    if (!res.ok) throw new Error('保存失败');
+    return res.json();
+  }
+</script>
+</body>
+</html>

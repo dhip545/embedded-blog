@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"D:\\\\code\\\\Blog\\\\css\" \"D:\\\\code\\\\Blog\\\\js\")",
+      "WebSearch",
+      "Bash(dir /s /b C:\\\\Users\\\\Administrator\\\\.claude\\\\skills 2>nul || echo \"目录不存在或为空\")",
+      "Bash(dir /s /b C:\\\\Users\\\\Administrator\\\\.claude)",
+      "Bash(findstr /i skill)",
+      "Bash(npx skills *)",
+      "WebFetch(domain:skills.sh)",
+      "Bash(git config *)",
+      "Bash(git clone *)",
+      "Bash(findstr proxy *)",
+      "Bash(curl -I https://www.baidu.com --connect-timeout 5)",
+      "Bash(curl -I https://github.com --proxy http://127.0.0.1:13745 --connect-timeout 5)",
+      "Bash(curl -I https://www.baidu.com --socks5 127.0.0.1:13745 --connect-timeout 5)",
+      "Bash(cmd /c \"rd C:\\\\Users\\\\Administrator\\\\.claude\\\\skills\\\\anthropic-skills\\\\frontend-design 2>nul & mklink /D C:\\\\Users\\\\Administrator\\\\.claude\\\\skills\\\\anthropic-skills\\\\frontend-design C:\\\\Users\\\\Administrator\\\\.claude\\\\skills\\\\anthropic-skills\\\\frontend-design\")",
+      "Bash(dir /b C:\\\\Users\\\\Administrator\\\\.claude\\\\skills\\\\gstack)",
+      "Bash(dir /b C:\\\\Users\\\\Administrator\\\\.claude\\\\skills\\\\anthropic-skills)",
+      "Bash(dir C:\\\\Users\\\\Administrator\\\\.claude\\\\skills 2>nul)",
+      "Bash(dir C:\\\\Users\\\\Administrator\\\\.claude\\\\skills\\\\gstack)",
+      "Bash(dir C:\\\\Users\\\\Administrator\\\\.claude\\\\skills\\\\anthropic-skills)",
+      "Bash(dir \"C:\\\\Users\\\\Administrator\\\\.claude\\\\skills\")",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "WebFetch(domain:luolt.cn)",
+      "Skill(gstack)",
+      "Skill(gstack:*)",
+      "Bash(ls ~/.claude/skills/ui-ux-pro-max/scripts/search.py 2>&1)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1780487018871,
+    "title": "w",
+    "content": "1",
+    "category": "学习笔记",
+    "tags": [
+      "1"
+    ],
+    "pinned": false,
+    "createdAt": "2026-06-03T11:43:38.871Z",
+    "updatedAt": "2026-06-03T11:43:38.871Z"
+  },
+  {
+    "id": 1717000000001,
+    "title": "STM32 点灯：嵌入式入门的第一个程序",
+    "content": "## 背景\n\n学习嵌入式第一个项目就是点亮 LED，相当于编程里的 \"Hello World\"。\n\n## 硬件准备\n\n- STM32F103C8T6 开发板\n- ST-Link 下载器\n- 一个 LED + 220Ω 电阻\n- 面包板 + 杜邦线\n\n## 代码实现\n\n```c\n#include \"stm32f10x.h\"\n\nvoid GPIO_Config(void) {\n    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);\n\n    GPIO_InitTypeDef GPIO_InitStructure;\n    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;\n    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;\n    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;\n    GPIO_Init(GPIOB, &GPIO_InitStructure);\n}\n\nint main(void) {\n    GPIO_Config();\n    while (1) {\n        GPIO_SetBits(GPIOB, GPIO_Pin_0);\n        Delay(500000);\n        GPIO_ResetBits(GPIOB, GPIO_Pin_0);\n        Delay(500000);\n    }\n}\n```\n\n## 遇到的问题\n\n> **问题：** 下载程序后 LED 不亮\n>\n> **原因：** 忘了调用 RCC_APB2PeriphClockCmd 使能 GPIOB 时钟\n>\n> **解决：** 加上时钟使能，恢复正常\n\n## 总结\n\n点灯虽简单，但涉及 GPIO 配置、时钟使能、延时函数等基本概念。",
+    "category": "学习笔记",
+    "tags": [
+      "STM32",
+      "GPIO",
+      "入门"
+    ],
+    "createdAt": "2024-05-28T08:00:00.000Z",
+    "updatedAt": "2024-05-28T08:00:00.000Z",
+    "pinned": true
+  },
+  {
+    "id": 1717000000002,
+    "title": "I2C 通信调试：从机无应答问题排查",
+    "content": "## 问题描述\n\n用 STM32F4 通过 I2C 读取 MPU6050 传感器数据时，发送从机地址后一直收不到 ACK。\n\n## 排查过程\n\n### 1. 检查硬件连接\n\n```\nSCL — PB6\nSDA — PB7\nVCC — 3.3V\nGND — GND\n```\n\nMPU6050 模块自带 4.7kΩ 上拉电阻，排除上拉问题。\n\n### 2. 检查 I2C 配置\n\n```c\nI2C_InitTypeDef i2c;\ni2c.I2C_ClockSpeed = 400000;\ni2c.I2C_Mode = I2C_Mode_I2C;\ni2c.I2C_DutyCycle = I2C_DutyCycle_2;\ni2c.I2C_Ack = I2C_Ack_Enable;\ni2c.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;\nI2C_Init(I2C1, &i2c);\nI2C_Cmd(I2C1, ENABLE);\n```\n\n配置看起来没问题。\n\n### 3. 发现真相\n\n查阅 MPU6050 数据手册：**AD0 引脚接地时地址为 0x68，接 VCC 时为 0x69**。\n\n实际电路中 AD0 接的是 VCC，而代码用的是 `0x68 << 1`。\n\n### 4. 修复\n\n```c\n#define MPU6050_ADDR   (0x69 << 1)  // AD0 = VCC\n```\n\n修改后通信恢复正常。\n\n## 经验\n\n1. 先查数据手册，确认设备地址\n2. 逻辑分析仪是 I2C 调试利器\n3. 不假设模块默认配置",
+    "category": "问题记录",
+    "tags": [
+      "I2C",
+      "MPU6050",
+      "调试"
+    ],
+    "createdAt": "2024-05-29T08:00:00.000Z",
+    "updatedAt": "2024-05-29T08:00:00.000Z",
+    "pinned": false
+  },
+  {
+    "id": 1717000000003,
+    "title": "FreeRTOS 优先级反转问题的分析与解决",
+    "content": "## 场景\n\n在一个 FreeRTOS 项目中，有三个任务：\n\n| 任务 | 优先级 | 功能 |\n|------|--------|------|\n| Task_High | 3 | 处理传感器数据 |\n| Task_Mid | 2 | LED 闪烁 |\n| Task_Low | 1 | 将数据写入 SD 卡 |\n\nTask_High 和 Task_Low 共享同一个互斥锁。\n\n## 问题\n\nTask_High 偶尔出现无法及时响应，导致传感器数据丢失。\n\n## 分析\n\n1. Task_Low 获取互斥锁，开始写入 SD 卡\n2. Task_Mid 就绪（优先级 2 > 1），抢占 Task_Low\n3. Task_High 就绪（优先级 3 > 2），需要互斥锁，但锁被 Task_Low 持有\n4. Task_Low 被 Task_Mid 抢占，无法运行，无法释放锁\n5. Task_High 无限等待 → **优先级反转**\n\n## 解决\n\n使用 FreeRTOS 互斥量代替二值信号量：\n\n```c\n// 错误：用二值信号量\nxSemaphoreCreateBinary();\n\n// 正确：用互斥量（支持优先级继承）\nxSemaphoreCreateMutex();\n```\n\nFreeRTOS 互斥量内置**优先级继承**机制：持有锁的低优先级任务临时提升到等待者的优先级。\n\n## 效果\n\nTask_High 最大响应延迟从 320ms 降到 5ms 以内。\n\n> 注意：优先级继承只能解决反转问题，不能解决死锁。",
+    "category": "项目分析",
+    "tags": [
+      "FreeRTOS",
+      "实时系统",
+      "优先级反转"
+    ],
+    "createdAt": "2024-05-30T14:00:00.000Z",
+    "updatedAt": "2024-05-30T14:00:00.000Z",
+    "pinned": false
+  }
+]
