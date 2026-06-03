@@ -15,7 +15,7 @@ from datetime import datetime
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 
-PORT = 8080
+PORT = int(os.environ.get("PORT", 8080))
 ADMIN_PASSWORD = os.environ.get("BLOG_ADMIN_PASSWORD", "admin123")
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 TOKENS = set()  # 内存 token 存储
