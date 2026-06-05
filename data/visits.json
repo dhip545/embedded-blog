@@ -334,5 +334,1174 @@
     "browser": "Chrome",
     "os": "Android",
     "time": "2026-06-03T20:57:52.422063"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:01:56.349376"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:01:57.032779"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:01:57.301848"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:03:28.043310"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:03:28.763910"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:03:28.808431"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:04:00.716113"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:04:01.285418"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:04:01.296496"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:20:18.497013"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:20:18.970094"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:21.285001"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:21.361036"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:21.716436"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/index.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:21.724549"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:21.733411"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/editor.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:21.966852"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:22.041451"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:22.317929"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/feed.xml",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:29.005130"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:29.413327"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:21:29.729760"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "未知",
+    "os": "未知",
+    "time": "2026-06-04T11:22:53.832768"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/feed.xml",
+    "browser": "未知",
+    "os": "未知",
+    "time": "2026-06-04T11:22:56.957416"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:23:27.034870"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:23:27.469002"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:24:31.295942"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:24:31.305136"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:24:31.316934"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:24:31.636409"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:24:32.054400"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:24:32.237156"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:26:12.303802"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "未知",
+    "os": "未知",
+    "time": "2026-06-04T11:28:12.942663"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/feed.xml",
+    "browser": "未知",
+    "os": "未知",
+    "time": "2026-06-04T11:28:13.427730"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:28:45.240020"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:28:45.720518"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:28:45.898838"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:28:45.976184"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:29:53.614152"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:29:53.939898"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:29:54.343621"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:29:54.544529"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:30:56.293990"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:30:56.629554"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:30:57.064214"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:30:57.188336"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:30:57.196785"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "未知",
+    "os": "未知",
+    "time": "2026-06-04T11:49:51.206176"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "未知",
+    "os": "未知",
+    "time": "2026-06-04T11:49:51.519071"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:50:19.494630"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:50:20.029494"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:50:20.208457"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:50:20.216086"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:51:16.409549"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "未知",
+    "os": "未知",
+    "time": "2026-06-04T11:52:33.309088"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:55:15.642029"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:55:16.229335"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:55:16.239257"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:56:21.201511"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:56:21.214315"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:56:21.537367"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:56:21.971247"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:56:22.142287"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "未知",
+    "os": "未知",
+    "time": "2026-06-04T11:59:30.493622"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "未知",
+    "os": "未知",
+    "time": "2026-06-04T11:59:30.791796"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:59:54.819620"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:59:55.299675"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:59:55.493468"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T11:59:55.505727"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:01:52.528102"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:01:52.536671"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:01:52.808289"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:01:52.917453"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:01:53.182867"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:01:53.249512"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:04:31.354885"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:04:52.582310"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:04:52.592249"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:04:52.600507"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:04:59.098756"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:04:59.531250"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:05:28.446620"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:05:28.469144"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:05:28.487180"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:05:28.505902"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:05:28.976179"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:05:29.144568"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:05:29.157494"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:09:18.446650"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:09:18.833624"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:09:34.208754"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:09:34.219138"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:09:34.229829"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:09:34.882705"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:09:35.037628"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:10:34.316831"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:10:34.708699"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:11:23.050284"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:11:23.064324"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:11:23.073736"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:11:23.083938"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:11:23.386821"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:11:23.399001"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:11:23.411685"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-04T12:11:23.776757"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T13:57:16.758641"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T13:57:17.335188"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T13:59:02.287986"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T13:59:02.296146"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T13:59:02.658372"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T13:59:03.071342"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T13:59:03.225233"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:00:15.119471"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:00:15.137183"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:00:15.436196"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:00:15.884118"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:00:16.038200"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:00:18.610992"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:00:18.619928"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/.well-known/appspecific/com.chrome.devtools.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:00:18.630070"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:01:08.610963"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:01:09.118319"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:01:09.295834"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:02:09.919551"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/.well-known/appspecific/com.chrome.devtools.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:02:09.952885"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:02:10.231297"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:02:10.652285"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:02:10.853142"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:03:55.939620"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/index.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:03:55.950266"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:03:56.381133"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:06:48.568739"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:06:49.064124"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:06:49.236660"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:06:49.247468"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/admin.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:02.912420"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:03.396402"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:03.597256"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:03.607337"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:32.213527"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:32.224771"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:32.865896"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:32.875850"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:33.190508"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:33.332791"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:33.365072"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:33.394469"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:33.472003"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/.well-known/appspecific/com.chrome.devtools.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:33.668085"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/.well-known/appspecific/com.chrome.devtools.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:16:33.984662"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:24:42.204325"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:24:42.443971"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:25:15.398604"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:25:15.415770"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:25:15.559204"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:26:14.766688"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:26:14.780337"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:26:15.084876"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:26:15.095827"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:26:34.374497"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:26:34.383197"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:26:34.538062"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/dashboard.html",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:28:11.310299"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:28:12.585049"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/manifest.json",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:28:12.646822"
+  },
+  {
+    "ip": "127.0.0.1",
+    "path": "/hybridaction/zybTrackerStatisticsAction",
+    "browser": "Chrome",
+    "os": "Windows",
+    "time": "2026-06-05T14:28:12.723639"
   }
 ]
