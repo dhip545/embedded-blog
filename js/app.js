@@ -11,7 +11,7 @@ let _isAdmin = null;
 async function apiAvailable() {
   if (_serverAvailable !== null) return _serverAvailable;
   try {
-    const res = await fetch(API_BASE + '/api/posts', { signal: AbortSignal.timeout(1500) });
+    const res = await fetch(API_BASE + '/api/posts', { signal: AbortSignal.timeout(800) });
     _serverAvailable = res.ok;
   } catch (e) {
     _serverAvailable = false;
@@ -340,9 +340,9 @@ function renderProfileCard() {
           <div class="stat"><span class="value">${tags}</span><span class="label">个标签</span></div>
         </div>
         <div class="profile-links">
-          ${p.github ? `<a href="https://github.com/${escapeHtml(p.github)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">GitHub</a>` : ''}
+          ${p.github ? `<a href="${formatGithubUrl(p.github)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">GitHub</a>` : ''}
           ${p.email ? `<a href="mailto:${escapeHtml(p.email)}" onclick="event.stopPropagation()">邮箱</a>` : ''}
-          ${p.bilibili ? `<a href="https://space.bilibili.com/${escapeHtml(p.bilibili)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">B站</a>` : ''}
+          ${p.bilibili ? `<a href="${formatBilibiliUrl(p.bilibili)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">B站</a>` : ''}
         </div>
       </div>
       ${isAdmin() ? '<button class="profile-edit" onclick="event.stopPropagation();openSettings()">编辑</button>' : ''}
@@ -463,11 +463,14 @@ function renderPosts() {
       <h2>${highlightSearch(p.title)}</h2>
       <div class="summary">${highlightSearch(getSummary(p.content))}</div>
       <div class="tags">${p.tags.map(t => `<span>${escapeHtml(t)}</span>`).join('')}</div>
-      ${isAdmin() ? `
-      <div class="card-actions" onclick="event.stopPropagation()">
-        <button class="btn-ghost" onclick="editPost(${p.id})">编辑</button>
-        <button class="btn-ghost" style="color:var(--danger);" onclick="requestDelete(${p.id})">删除</button>
-      </div>` : ''}
+      <div class="post-footer" onclick="event.stopPropagation()">
+        ${renderLikeButton(p.id)}
+        ${isAdmin() ? `
+        <div class="card-actions">
+          <button class="btn-ghost" onclick="editPost(${p.id})">编辑</button>
+          <button class="btn-ghost" style="color:var(--danger);" onclick="requestDelete(${p.id})">删除</button>
+        </div>` : ''}
+      </div>
     </div>
   `).join('');
 
@@ -499,6 +502,70 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// ===== 点赞系统 =====
+function getLikes() {
+  return JSON.parse(localStorage.getItem('blog_likes') || '{}');
+}
+function saveLikes(likes) {
+  localStorage.setItem('blog_likes', JSON.stringify(likes));
+}
+function getLikedPosts() {
+  return JSON.parse(localStorage.getItem('blog_liked') || '{}');
+}
+function saveLikedPosts(liked) {
+  localStorage.setItem('blog_liked', JSON.stringify(liked));
+}
+function toggleLike(postId, event) {
+  if (event) event.stopPropagation();
+  const likes = getLikes();
+  const liked = getLikedPosts();
+  if (liked[postId]) {
+    delete liked[postId];
+    likes[postId] = Math.max(0, (likes[postId] || 0) - 1);
+  } else {
+    liked[postId] = true;
+    likes[postId] = (likes[postId] || 0) + 1;
+  }
+  saveLikes(likes);
+  saveLikedPosts(liked);
+  // 更新当前页面上该文章的所有 like 按钮
+  document.querySelectorAll(`.like-btn[data-post-id="${postId}"]`).forEach(btn => {
+    const countEl = btn.querySelector('.like-count');
+    const count = likes[postId] || 0;
+    if (countEl) countEl.textContent = count || '';
+    const isNowLiked = !!liked[postId];
+    btn.classList.toggle('liked', isNowLiked);
+    // 更新 SVG 填充
+    const svg = btn.querySelector('svg');
+    if (svg) svg.setAttribute('fill', isNowLiked ? 'currentColor' : 'none');
+  });
+}
+function renderLikeButton(postId) {
+  const likes = getLikes();
+  const liked = getLikedPosts();
+  const count = likes[postId] || 0;
+  const isLiked = !!liked[postId];
+  return `<button class="like-btn ${isLiked ? 'liked' : ''}" data-post-id="${postId}" onclick="toggleLike(${postId}, event)" aria-label="点赞">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span class="like-count">${count || ''}</span>
+  </button>`;
+}
+
+// ===== URL 格式化辅助 =====
+function formatGithubUrl(input) {
+  const trimmed = input.trim();
+  // 已经是完整 URL
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  // 去掉可能的 @ 前缀
+  const clean = trimmed.replace(/^@/, '');
+  return `https://github.com/${clean}`;
+}
+function formatBilibiliUrl(input) {
+  const trimmed = input.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://space.bilibili.com/${trimmed}`;
 }
 
 // 墨渍水印辅助函数
@@ -769,6 +836,11 @@ function openPost(id) {
       ${post.tags.map(t => `<span style="color:var(--text-dim);">${escapeHtml(t)}</span>`).join(' ')}
     </div>
     <h1 style="font-family:var(--font-serif);font-size:1.55rem;font-weight:700;margin-bottom:20px;">${escapeHtml(post.title)}</h1>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;">${renderLikeButton(post.id)}
+      <button class="copy-link-btn" data-post-id="${post.id}" onclick="copyPostLink(${post.id})" aria-label="复制链接">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> 复制链接
+      </button>
+    </div>
     <div class="post-content">${html}</div>
   `;
 
@@ -797,6 +869,48 @@ function openPost(id) {
   if (typeof hljs !== 'undefined') {
     body.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
   }
+
+  // KaTeX 数学公式渲染
+  if (typeof renderMathInElement !== 'undefined') {
+    try {
+      renderMathInElement(body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false
+      });
+    } catch(e) {}
+  }
+}
+
+async function copyPostLink(postId) {
+  const url = `${location.origin}${location.pathname}?post=${postId}`;
+  const btn = document.querySelector(`.copy-link-btn[data-post-id="${postId}"]`);
+  const originalHTML = btn ? btn.innerHTML : '';
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  // 按钮即时反馈
+  if (btn) {
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 已复制';
+    btn.style.borderColor = '#10B981';
+    btn.style.color = '#10B981';
+    setTimeout(() => {
+      btn.innerHTML = originalHTML;
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 2000);
+  }
+  showToast('链接已复制');
 }
 
 function closeModal() {
@@ -862,14 +976,57 @@ async function openProfileDetail() {
 
     ${(p.github || p.email || p.bilibili) ? `
     <div style="border-top:1px solid var(--border);padding-top:14px;display:flex;gap:8px;justify-content:center;">
-      ${p.github ? `<a href="https://github.com/${escapeHtml(p.github)}" target="_blank" rel="noopener" style="padding:6px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;color:var(--text-muted);text-decoration:none;">GitHub</a>` : ''}
+      ${p.github ? `<a href="${formatGithubUrl(p.github)}" target="_blank" rel="noopener" style="padding:6px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;color:var(--text-muted);text-decoration:none;">GitHub</a>` : ''}
       ${p.email ? `<a href="mailto:${escapeHtml(p.email)}" style="padding:6px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;color:var(--text-muted);text-decoration:none;">邮箱</a>` : ''}
-      ${p.bilibili ? `<a href="https://space.bilibili.com/${escapeHtml(p.bilibili)}" target="_blank" rel="noopener" style="padding:6px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;color:var(--text-muted);text-decoration:none;">B站</a>` : ''}
+      ${p.bilibili ? `<a href="${formatBilibiliUrl(p.bilibili)}" target="_blank" rel="noopener" style="padding:6px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;color:var(--text-muted);text-decoration:none;">B站</a>` : ''}
     </div>` : ''}
   `;
 
   document.getElementById('profileDetailModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+// ===== 图片灯箱 =====
+function initLightbox() {
+  document.addEventListener('click', function(e) {
+    // 只处理文章内容区域内的图片点击
+    const img = e.target.closest('#modalBody img, #postList img, .preview-pane img');
+    if (!img) return;
+    if (img.closest('.profile-avatar')) return; // 排除头像
+    if (img.closest('#lightbox')) return;        // 排除灯箱自身
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    if (!lightbox || !lightboxImg) return;
+
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt || '';
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+
+  // 关闭
+  document.getElementById('lightbox')?.addEventListener('click', function(e) {
+    if (e.target === this || e.target.classList.contains('lightbox-close') || e.target.closest('.lightbox-close')) {
+      closeLightbox();
+    }
+  });
+
+  // Escape 关闭
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+}
+
+function closeLightbox() {
+  const lightbox = document.getElementById('lightbox');
+  if (!lightbox) return;
+  lightbox.classList.remove('open');
+  document.body.style.overflow = '';
+  // 延迟清除 src 防止闪烁
+  setTimeout(() => {
+    document.getElementById('lightboxImg').src = '';
+  }, 300);
 }
 
 function closeProfileDetail() {
@@ -964,14 +1121,30 @@ function toggleTheme() {
     document.documentElement.removeAttribute('data-theme');
   }
   localStorage.setItem('blog_theme', next || 'light');
+  // 切换代码高亮主题
+  switchHighlightTheme(next === 'dark');
   // Bug1 修复：只更新 aria-label="切换主题" 的按钮，不影响设置按钮
   updateThemeIcon(document.querySelector('[aria-label="切换主题"]'));
+}
+
+function switchHighlightTheme(isDark) {
+  const lightCSS = document.getElementById('hljs-light');
+  const darkCSS = document.getElementById('hljs-dark');
+  if (lightCSS) lightCSS.disabled = isDark;
+  if (darkCSS) {
+    // 懒加载暗色主题 CSS
+    if (!darkCSS.href && darkCSS.dataset.href) {
+      darkCSS.href = darkCSS.dataset.href;
+    }
+    darkCSS.disabled = !isDark;
+  }
 }
 
 function loadTheme() {
   const saved = localStorage.getItem('blog_theme');
   if (saved === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
+    switchHighlightTheme(true);
   }
 }
 
@@ -1456,23 +1629,40 @@ function initChipDeco() {
   document.body.appendChild(chip);
 }
 
+// ===== 页面检测 =====
+function getPageType() {
+  const path = location.pathname.replace(/\/$/, '') || '/index.html';
+  if (path.endsWith('admin.html')) return 'admin';
+  if (path.endsWith('dashboard.html')) return 'dashboard';
+  if (path.endsWith('editor.html')) return 'editor';
+  return 'home';
+}
+
 // ===== 初始化 =====
 document.addEventListener('DOMContentLoaded', async function () {
+  const page = getPageType();
   loadTheme();
 
-  // 尝试从服务端 API 加载数据
-  const useServer = await apiAvailable();
-  if (useServer) {
-    try {
-      const serverPosts = await apiGetPosts();
-      savePosts(serverPosts);  // 同步到 localStorage 作为缓存
-      const serverProfile = await apiGetProfile();
-      saveProfile(serverProfile);
-    } catch (e) {
-      console.log('API 加载失败，使用本地数据');
+  // PWA: 注册 Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+
+  // 只在首页尝试从服务端加载数据（避免每页都请求）
+  if (page === 'home') {
+    const useServer = await apiAvailable();
+    if (useServer) {
+      try {
+        const serverPosts = await apiGetPosts();
+        savePosts(serverPosts);
+        const serverProfile = await apiGetProfile();
+        saveProfile(serverProfile);
+      } catch (e) {
+        console.log('API 加载失败，使用本地数据');
+      }
+    } else {
+      initSampleData();
     }
-  } else {
-    initSampleData();
   }
 
   // 管理员 UI：显示后台按钮/写文章、隐藏访客管理入口
@@ -1481,28 +1671,33 @@ document.addEventListener('DOMContentLoaded', async function () {
     const btnAdmin = document.getElementById('btnAdmin');
     if (btnAdmin) btnAdmin.style.display = 'none';
   } else {
-    // 访客：隐藏后台相关按钮
     document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
   }
 
-  renderAll();
+  // 首页渲染全部内容
+  if (page === 'home') {
+    renderAll();
+  }
 
+  // 导航栏滚动效果（所有页面）
   initNavScroll();
-  initRipple();
-  initCodeRain();
-  initInkParticles();
-  initCardTilt();
 
-  // 新增功能1：搜索
-  initSearch();
+  // 以下视觉效果仅首页需要
+  if (page === 'home' || page === 'editor') {
+    initRipple();
+    initCodeRain();
+    initInkParticles();
+  }
 
-  // 新增功能3+4：回到顶部 + 滚动进度条
+  if (page === 'home') {
+    initCardTilt();
+    initSearch();
+    initLightbox();
+  }
+
+  // 所有页面都需要
   initScrollFeatures();
-
-  // 新增 UI 改进6：SVG 图标
   initNavIcons();
-
-  // 新增背景装饰2：右上角芯片 CSS 元素
   initChipDeco();
 
   // 标签云事件委托

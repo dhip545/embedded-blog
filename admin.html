@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#B91C1C">
+  <link rel="manifest" href="/manifest.json">
   <title>管理登录 — 嵌入式学习笔记</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
@@ -54,7 +56,7 @@
 <nav class="navbar">
   <div class="logo"><span>&#21360;</span> 嵌入式学习笔记</div>
   <div class="nav-actions">
-    <button onclick="toggleTheme()" class="theme-btn" aria-label="切换主题">&#9711;</button>
+    <button onclick="toggleTheme()" class="theme-btn" aria-label="切换主题"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
     <button onclick="location.href='index.html'">← 首页</button>
   </div>
 </nav>
@@ -62,17 +64,22 @@
 <div class="login-container">
   <h1>管理登录</h1>
   <div class="sub">输入密码以管理文章</div>
+  <label for="password" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">管理密码</label>
   <input type="password" id="password" placeholder="管理密码" autofocus>
   <div class="error" id="error"></div>
-  <button class="btn-primary btn-write" onclick="login()">登录</button>
+  <button class="btn-primary btn-write" id="loginBtn" onclick="login()">登录</button>
 </div>
 
 <script src="js/app.js"></script>
 <script>
   async function login() {
+    const btn = document.getElementById('loginBtn');
     const password = document.getElementById('password').value;
     const errorEl = document.getElementById('error');
     if (!password) { errorEl.textContent = '请输入密码'; return; }
+
+    btn.disabled = true;
+    btn.textContent = '登录中...';
 
     try {
       const res = await fetch('/api/admin', {
@@ -86,9 +93,13 @@
         location.href = 'dashboard.html';
       } else {
         errorEl.textContent = data.error || '密码错误';
+        btn.disabled = false;
+        btn.textContent = '登录';
       }
     } catch (e) {
       errorEl.textContent = '无法连接到服务器';
+      btn.disabled = false;
+      btn.textContent = '登录';
     }
   }
 

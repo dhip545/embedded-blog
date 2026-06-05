@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#B91C1C">
+  <link rel="manifest" href="/manifest.json">
   <title>写文章 — 嵌入式学习笔记</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <link rel="stylesheet" id="hljs-light" href="lib/highlight-github.min.css">
+  <link rel="stylesheet" id="hljs-dark" data-href="lib/highlight-github-dark.min.css" disabled>
+  <link rel="stylesheet" href="lib/katex.min.css">
 </head>
 <body class="page-editor">
 
@@ -16,7 +20,7 @@
 <nav class="navbar">
   <div class="logo"><span>&#21360;</span> 嵌入式学习笔记</div>
   <div class="nav-actions">
-    <button onclick="toggleTheme()" class="theme-btn" aria-label="切换主题">&#9711;</button>
+    <button onclick="toggleTheme()" class="theme-btn" aria-label="切换主题"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
     <button onclick="location.href='index.html'">← 首页</button>
   </div>
 </nav>
@@ -69,12 +73,14 @@
 
   <div class="editor-actions">
     <button class="btn-secondary" onclick="location.href='index.html'">取消</button>
-    <button class="btn-primary btn-write" onclick="savePost()">保存</button>
+    <button class="btn-primary btn-write" id="saveBtn" onclick="savePost()">保存</button>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="lib/marked.min.js"></script>
+<script src="lib/highlight.min.js"></script>
+<script src="lib/katex.min.js"></script>
+<script src="lib/katex-auto-render.min.js"></script>
 <script src="js/app.js"></script>
 <script>
   marked.use({ breaks: true, gfm: true });
@@ -113,6 +119,20 @@
     const html = marked.parse(editorEl.value || '*输入内容后这里显示预览...*');
     document.getElementById('preview').innerHTML = html;
     document.querySelectorAll('#preview pre code').forEach(b => hljs.highlightElement(b));
+    // KaTeX 渲染
+    if (typeof renderMathInElement !== 'undefined') {
+      try {
+        renderMathInElement(document.getElementById('preview'), {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false}
+          ],
+          throwOnError: false
+        });
+      } catch(e) {}
+    }
   }
   updatePreview();
   document.getElementById('charCount').textContent =
@@ -127,6 +147,7 @@
   });
 
   async function savePost() {
+    const btn = document.getElementById('saveBtn');
     const title = document.getElementById('postTitle').value.trim();
     const content = document.getElementById('editor').value.trim();
     const category = document.getElementById('postCategory').value;
@@ -134,6 +155,9 @@
     const pinned = document.getElementById('postPinned').checked;
     if (!title) { alert('请输入标题'); return; }
     if (!content) { alert('请输入内容'); return; }
+
+    btn.disabled = true;
+    btn.textContent = '保存中...';
 
     let posts = JSON.parse(localStorage.getItem('blog_posts') || '[]');
     const now = new Date().toISOString();
@@ -168,8 +192,8 @@
       } catch(e) { console.log('服务端同步失败:', e); }
     }
 
-    alert('保存成功');
-    setTimeout(() => { location.href = 'index.html'; }, 300);
+    btn.textContent = '已保存';
+    setTimeout(() => { location.href = 'index.html'; }, 600);
   }
 
   // 检查管理员状态

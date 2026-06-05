@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#B91C1C">
+  <link rel="manifest" href="/manifest.json">
   <title>管理后台 — 嵌入式学习笔记</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
@@ -94,7 +96,7 @@
 <nav class="navbar">
   <div class="logo"><span>&#21360;</span> 管理后台</div>
   <div class="nav-actions">
-    <button onclick="toggleTheme()" class="theme-btn" aria-label="切换主题">&#9711;</button>
+    <button onclick="toggleTheme()" class="theme-btn" aria-label="切换主题"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
     <a href="index.html" style="font-size:.84rem;color:var(--text-muted);text-decoration:none;padding:6px 12px;">← 首页</a>
     <button class="btn-write" onclick="location.href='editor.html'">写文章</button>
   </div>
@@ -138,6 +140,19 @@
   <div class="panel">
     <h3>个人信息</h3>
     <div id="profileForm">
+      <!-- 头像上传 -->
+      <div class="field" style="margin-bottom:14px;">
+        <label>头像</label>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div id="pfAvatarPreview" style="width:72px;height:72px;border-radius:50%;background:var(--bg-subtle);border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:1.6rem;overflow:hidden;flex-shrink:0;cursor:pointer;transition:border-color .2s;" onclick="document.getElementById('pfAvatarFile').click()" title="点击上传头像">!</div>
+          <div style="flex:1;">
+            <input type="file" id="pfAvatarFile" accept="image/*" style="display:none;" onchange="handleAvatarUpload(this)">
+            <input type="text" id="pfAvatar" placeholder="或粘贴图片 URL..." style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);" oninput="updateAvatarPreview(this.value)">
+            <div style="font-size:.68rem;color:var(--text-dim);margin-top:4px;">点击圆圈上传本地图片，或粘贴 URL</div>
+          </div>
+        </div>
+      </div>
+
       <div class="field" style="margin-bottom:10px;">
         <label>昵称</label>
         <input type="text" id="pfNickname" placeholder="你的昵称" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);">
@@ -147,10 +162,13 @@
         <input type="text" id="pfBio" placeholder="一句话介绍" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-        <div class="field"><label>GitHub</label><input type="text" id="pfGithub" placeholder="用户名" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);"></div>
+        <div class="field"><label>GitHub</label><input type="text" id="pfGithub" placeholder="用户名 或 https://..." style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);"></div>
         <div class="field"><label>邮箱</label><input type="text" id="pfEmail" placeholder="example@mail.com" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);"></div>
       </div>
-      <button class="btn-primary" onclick="saveProfile()">保存个人信息</button>
+      <div style="margin-bottom:12px;">
+        <div class="field"><label>B站</label><input type="text" id="pfBilibili" placeholder="UID 或 主页链接" style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);font-size:.84rem;font-family:var(--font-sans);"></div>
+      </div>
+      <button class="btn-primary" id="pfSaveBtn" onclick="saveProfile()">保存个人信息</button>
     </div>
   </div>
 </div>
@@ -237,32 +255,94 @@
   }
 
   async function loadProfile() {
+    // 优先从 localStorage 加载，保证离线可用
+    const localProfile = JSON.parse(localStorage.getItem('blog_profile') || '{}');
     try {
       const res = await fetch('/api/profile');
       const p = await res.json();
-      document.getElementById('pfNickname').value = p.nickname || '';
-      document.getElementById('pfBio').value = p.bio || '';
-      document.getElementById('pfGithub').value = p.github || '';
-      document.getElementById('pfEmail').value = p.email || '';
-    } catch(e) {}
+      // 合并服务端数据到本地
+      const merged = { ...localProfile, ...p };
+      localStorage.setItem('blog_profile', JSON.stringify(merged));
+      document.getElementById('pfNickname').value = merged.nickname || '';
+      document.getElementById('pfBio').value = merged.bio || '';
+      document.getElementById('pfAvatar').value = merged.avatar || '';
+      document.getElementById('pfGithub').value = merged.github || '';
+      document.getElementById('pfEmail').value = merged.email || '';
+      document.getElementById('pfBilibili').value = merged.bilibili || '';
+      updateAvatarPreview(merged.avatar || '');
+    } catch(e) {
+      document.getElementById('pfNickname').value = localProfile.nickname || '';
+      document.getElementById('pfBio').value = localProfile.bio || '';
+      document.getElementById('pfAvatar').value = localProfile.avatar || '';
+      document.getElementById('pfGithub').value = localProfile.github || '';
+      document.getElementById('pfEmail').value = localProfile.email || '';
+      document.getElementById('pfBilibili').value = localProfile.bilibili || '';
+      updateAvatarPreview(localProfile.avatar || '');
+    }
   }
 
   async function saveProfile() {
+    const btn = document.getElementById('pfSaveBtn');
     const profile = {
       nickname: document.getElementById('pfNickname').value.trim() || '嵌入式爱好者',
       bio: document.getElementById('pfBio').value.trim() || '',
-      avatar: '',
+      avatar: document.getElementById('pfAvatar').value.trim(),
       github: document.getElementById('pfGithub').value.trim(),
       email: document.getElementById('pfEmail').value.trim(),
-      bilibili: ''
+      bilibili: document.getElementById('pfBilibili').value.trim()
     };
+
+    // 同时保存到 localStorage
+    localStorage.setItem('blog_profile', JSON.stringify(profile));
+
+    btn.disabled = true;
+    btn.textContent = '保存中...';
+
     try {
       const res = await fetch('/api/profile', {
         method: 'PUT', headers: authHeaders,
         body: JSON.stringify(profile)
       });
-      if (res.ok) { alert('已保存'); }
-    } catch(e) { alert('保存失败'); }
+      if (res.ok) {
+        alert('已保存');
+      } else {
+        alert('服务器保存失败，数据已存本地');
+      }
+    } catch(e) { alert('网络错误，数据已存本地'); }
+
+    btn.disabled = false;
+    btn.textContent = '保存个人信息';
+  }
+
+  // 头像预览
+  function updateAvatarPreview(url) {
+    const preview = document.getElementById('pfAvatarPreview');
+    if (!preview) return;
+    if (url) {
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = '头像预览';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      img.onerror = function() { preview.textContent = '!'; };
+      preview.innerHTML = '';
+      preview.appendChild(img);
+    } else {
+      preview.textContent = '!';
+    }
+  }
+
+  // 本地图片上传转 base64
+  function handleAvatarUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { alert('图片不能超过 2MB'); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const base64 = e.target.result;
+      document.getElementById('pfAvatar').value = base64;
+      updateAvatarPreview(base64);
+    };
+    reader.readAsDataURL(file);
   }
 
   async function delPost(id) {

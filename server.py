@@ -160,8 +160,74 @@ class BlogHandler(SimpleHTTPRequestHandler):
                 "recent": visits[-10:]
             })
 
+        # RSS 订阅
+        if path == "/feed.xml":
+            return self.serve_rss()
+
         # 静态文件
         return self.serve_static()
+
+    def serve_rss(self):
+        """生成 Atom 格式 RSS 订阅"""
+        posts = load_json("posts.json") or []
+        profile = load_json("profile.json") or {}
+        blog_title = profile.get("nickname", "嵌入式学习笔记")
+        blog_desc = profile.get("bio", "嵌入式开发学习记录")
+
+        host = self.headers.get("Host", f"localhost:{PORT}")
+        base_url = f"http://{host}"
+
+        items = []
+        for p in posts[:20]:  # 最多 20 篇
+            pub_date = p.get("createdAt", "")
+            updated = p.get("updatedAt", pub_date)
+            # 转 RFC 3339
+            try:
+                dt = datetime.fromisoformat(pub_date.replace("Z", "+00:00"))
+                pub_date = dt.isoformat()
+            except:
+                pass
+            try:
+                dt = datetime.fromisoformat(updated.replace("Z", "+00:00"))
+                updated = dt.isoformat()
+            except:
+                pass
+
+            post_url = f"{base_url}?post={p['id']}"
+            content = p.get("content", "")[:5000]  # 截断长文章
+            title = p.get("title", "无标题")
+            items.append(f"""  <entry>
+    <title>{self._xml_escape(title)}</title>
+    <link href="{self._xml_escape(post_url)}"/>
+    <id>urn:post:{p['id']}</id>
+    <updated>{updated}</updated>
+    <published>{pub_date}</published>
+    <author><name>{self._xml_escape(blog_title)}</name></author>
+    <summary type="html">{self._xml_escape(content[:300])}</summary>
+  </entry>""")
+
+        xml = f"""<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>{self._xml_escape(blog_title)}</title>
+  <subtitle>{self._xml_escape(blog_desc)}</subtitle>
+  <link href="{self._xml_escape(base_url + '/feed.xml')}" rel="self"/>
+  <link href="{self._xml_escape(base_url + '/')}"/>
+  <id>{self._xml_escape(base_url + '/')}</id>
+  <updated>{datetime.now().isoformat()}</updated>
+{chr(10).join(items)}
+</feed>"""
+
+        data = xml.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/xml; charset=utf-8")
+        self.send_header("Content-Length", len(data))
+        self.end_headers()
+        self.wfile.write(data)
+
+    @staticmethod
+    def _xml_escape(text):
+        """XML 实体转义"""
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace("'", "&apos;")
 
     def do_POST(self):
         parsed = urlparse(self.path)
@@ -278,6 +344,13 @@ class BlogHandler(SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", len(data))
+            # 缓存策略：静态资源长期缓存，HTML 短期缓存
+            if ext in (".css", ".js", ".svg", ".png", ".jpg", ".jpeg", ".ico", ".woff", ".woff2", ".ttf", ".map"):
+                self.send_header("Cache-Control", "public, max-age=86400")
+            elif ext == ".html":
+                self.send_header("Cache-Control", "public, max-age=3600")
+            else:
+                self.send_header("Cache-Control", "no-cache")
             self.end_headers()
             self.wfile.write(data)
         else:

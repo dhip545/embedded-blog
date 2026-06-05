@@ -1,17 +1,5 @@
 [
   {
-    "id": 1780487018871,
-    "title": "w",
-    "content": "1",
-    "category": "学习笔记",
-    "tags": [
-      "1"
-    ],
-    "pinned": false,
-    "createdAt": "2026-06-03T11:43:38.871Z",
-    "updatedAt": "2026-06-03T11:43:38.871Z"
-  },
-  {
     "id": 1717000000001,
     "title": "STM32 点灯：嵌入式入门的第一个程序",
     "content": "## 背景\n\n学习嵌入式第一个项目就是点亮 LED，相当于编程里的 \"Hello World\"。\n\n## 硬件准备\n\n- STM32F103C8T6 开发板\n- ST-Link 下载器\n- 一个 LED + 220Ω 电阻\n- 面包板 + 杜邦线\n\n## 代码实现\n\n```c\n#include \"stm32f10x.h\"\n\nvoid GPIO_Config(void) {\n    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);\n\n    GPIO_InitTypeDef GPIO_InitStructure;\n    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;\n    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;\n    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;\n    GPIO_Init(GPIOB, &GPIO_InitStructure);\n}\n\nint main(void) {\n    GPIO_Config();\n    while (1) {\n        GPIO_SetBits(GPIOB, GPIO_Pin_0);\n        Delay(500000);\n        GPIO_ResetBits(GPIOB, GPIO_Pin_0);\n        Delay(500000);\n    }\n}\n```\n\n## 遇到的问题\n\n> **问题：** 下载程序后 LED 不亮\n>\n> **原因：** 忘了调用 RCC_APB2PeriphClockCmd 使能 GPIOB 时钟\n>\n> **解决：** 加上时钟使能，恢复正常\n\n## 总结\n\n点灯虽简单，但涉及 GPIO 配置、时钟使能、延时函数等基本概念。",
