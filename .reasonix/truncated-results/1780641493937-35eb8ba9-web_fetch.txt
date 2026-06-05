@@ -1,0 +1,970 @@
+https://embedded-blog-production.up.railway.app/js/app.js
+
+/* ===================================================
+   app.js — 嵌入式学习笔记 核心逻辑
+   支持服务端 API + localStorage 双模数据加载
+   =================================================== */
+
+// ===== API 模块 =====
+const API_BASE = '';
+let _serverAvailable = null;
+let _isAdmin = null;
+
+async function apiAvailable() {
+  if (_serverAvailable !== null) return _serverAvailable;
+  try {
+    const res = await fetch(API_BASE + '/api/posts', { signal: AbortSignal.timeout(800) });
+    _serverAvailable = res.ok;
+  } catch (e) {
+    _serverAvailable = false;
+  }
+  return _serverAvailable;
+}
+
+function isAdmin() {
+  if (_isAdmin !== null) return _isAdmin;
+  _isAdmin = !!sessionStorage.getItem('blog_admin_token');
+  return _isAdmin;
+}
+
+function getAuthHeaders() {
+  const token = sessionStorage.getItem('blog_admin_token');
+  return token ? { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
+               : { 'Content-Type': 'application/json' };
+}
+
+async function apiGetPosts() {
+  const res = await fetch(API_BASE + '/api/posts');
+  if (!res.ok) throw new Error('API error');
+  return res.json();
+}
+
+async function apiGetProfile() {
+  const res = await fetch(API_BASE + '/api/profile');
+  if (!res.ok) throw new Error('API error');
+  return res.json();
+}
+
+async function apiSavePost(post) {
+  const headers = getAuthHeaders();
+  const isUpdate = post.id && post.id < 1000000000000 ? false : false;
+  // 判断：如果 posts 中已存在同 id，用 PUT；否则用 POST
+  const url = API_BASE + '/api/posts';
+  const method = 'POST';
+  const res = await fetch(url, { method, headers, body: JSON.stringify(post) });
+  if (!res.ok) throw new Error('保存失败');
+  return res.json();
+}
+
+async function apiUpdatePost(post) {
+  const headers = getAuthHeaders();
+  const res = await fetch(API_BASE + '/api/posts/' + post.id, {
+    method: 'PUT', headers, body: JSON.stringify(post)
+  });
+  if (!res.ok) throw new Error('更新失败');
+  return res.json();
+}
+
+async function apiDeletePost(id) {
+  const headers = getAuthHeaders();
+  const res = await fetch(API_BASE + '/api/posts/' + id, { method: 'DELETE', headers });
+  if (!res.ok) throw new Error('删除失败');
+}
+
+async function apiSaveProfile(profile) {
+  const headers = getAuthHeaders();
+  const res = await fetch(API_BASE + '/api/profile', {
+    method: 'PUT', headers, body: JSON.stringify(profile)
+  });
+  if (!res.ok) throw new Error('保存失败');
+  return res.json();
+}
+
+// ===== Markdown 配置 =====
+if (typeof marked !== 'undefined') {
+  marked.setOptions({ breaks: true, gfm: true });
+}
+
+// ===== 数据操作 =====
+const STORAGE_KEY = 'blog_posts';
+const PROFILE_KEY = 'blog_profile';
+const INIT_KEY = 'blog_initialized';
+
+function getPosts() {
+  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+}
+
+function savePosts(posts) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+}
+
+// ===== 个人信息 =====
+function getProfile() {
+  return JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+}
+
+function saveProfile(profile) {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+}
+
+function getDefaultProfile() {
+  return {
+    nickname: '嵌入式爱好者',
+    bio: '一名正在学习嵌入式开发的大学生',
+    avatar: '',
+    github: '',
+    email: '',
+    bilibili: ''
+  };
+}
+
+function ensureProfile() {
+  let p = getProfile();
+  if (!p.nickname) { p = getDefaultProfile(); saveProfile(p); }
+  return p;
+}
+
+// ===== 初始化示例数据 =====
+function initSampleData() {
+  if (localStorage.getItem(INIT_KEY) === 'true') return;
+  localStorage.setItem(INIT_KEY, 'true');
+  ensureProfile();
+
+  const posts = getPosts();
+  if (posts.length > 0) return;
+
+  const samples = [
+    {
+      id: Date.now() - 86400000 * 2,
+      title: 'STM32 点灯：嵌入式入门的第一个程序',
+      content: `## 背景
+
+学习嵌入式第一个项目就是点亮 LED，相当于编程里的 "Hello World"。
+
+## 硬件准备
+
+- STM32F103C8T6 开发板
+- ST-Link 下载器
+- 一个 LED + 220Ω 电阻
+- 面包板 + 杜邦线
+
+## 代码实现
+
+\`\`\`c
+#include "stm32f10x.h"
+
+void GPIO_Config(void) {
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOB, &GPIO_InitStructure);
+}
+
+int main(void) {
+    GPIO_Config();
+    while (1) {
+        GPIO_SetBits(GPIOB, GPIO_Pin_0);
+        Delay(500000);
+        GPIO_ResetBits(GPIOB, GPIO_Pin_0);
+        Delay(500000);
+    }
+}
+\`\`\`
+
+## 遇到的问题
+
+> **问题：** 下载程序后 LED 不亮
+>
+> **原因：** 忘了调用 RCC_APB2PeriphClockCmd 使能 GPIOB 时钟
+>
+> **解决：** 加上时钟使能，恢复正常
+
+## 总结
+
+点灯虽简单，但涉及 GPIO 配置、时钟使能、延时函数等基本概念。`,
+      category: '学习笔记',
+      tags: ['STM32', 'GPIO', '入门'],
+      createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+      pinned: true
+    },
+    {
+      id: Date.now() - 86400000,
+      title: 'I2C 通信调试：从机无应答问题排查',
+      content: `## 问题描述
+
+用 STM32F4 通过 I2C 读取 MPU6050 传感器数据时，发送从机地址后一直收不到 ACK。
+
+## 排查过程
+
+### 1. 检查硬件连接
+
+\`\`\`
+SCL — PB6
+SDA — PB7
+VCC — 3.3V
+GND — GND
+\`\`\`
+
+MPU6050 模块自带 4.7kΩ 上拉电阻，排除上拉问题。
+
+### 2. 检查 I2C 配置
+
+\`\`\`c
+I2C_InitTypeDef i2c;
+i2c.I2C_ClockSpeed = 400000;
+i2c.I2C_Mode = I2C_Mode_I2C;
+i2c.I2C_DutyCycle = I2C_DutyCycle_2;
+i2c.I2C_Ack = I2C_Ack_Enable;
+i2c.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+I2C_Init(I2C1, &i2c);
+I2C_Cmd(I2C1, ENABLE);
+\`\`\`
+
+配置看起来没问题。
+
+### 3. 发现真相
+
+查阅 MPU6050 数据手册：**AD0 引脚接地时地址为 0x68，接 VCC 时为 0x69**。
+
+实际电路中 AD0 接的是 VCC，而代码用的是 \`0x68 << 1\`。
+
+### 4. 修复
+
+\`\`\`c
+#define MPU6050_ADDR   (0x69 << 1)  // AD0 = VCC
+\`\`\`
+
+修改后通信恢复正常。
+
+## 经验
+
+1. 先查数据手册，确认设备地址
+2. 逻辑分析仪是 I2C 调试利器
+3. 不假设模块默认配置`,
+      category: '问题记录',
+      tags: ['I2C', 'MPU6050', '调试'],
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
+      updatedAt: new Date(Date.now() - 86400000).toISOString(),
+      pinned: false
+    },
+    {
+      id: Date.now() - 3600000,
+      title: 'FreeRTOS 优先级反转问题的分析与解决',
+      content: `## 场景
+
+在一个 FreeRTOS 项目中，有三个任务：
+
+| 任务 | 优先级 | 功能 |
+|------|--------|------|
+| Task_High | 3 | 处理传感器数据 |
+| Task_Mid | 2 | LED 闪烁 |
+| Task_Low | 1 | 将数据写入 SD 卡 |
+
+Task_High 和 Task_Low 共享同一个互斥锁。
+
+## 问题
+
+Task_High 偶尔出现无法及时响应，导致传感器数据丢失。
+
+## 分析
+
+1. Task_Low 获取互斥锁，开始写入 SD 卡
+2. Task_Mid 就绪（优先级 2 > 1），抢占 Task_Low
+3. Task_High 就绪（优先级 3 > 2），需要互斥锁，但锁被 Task_Low 持有
+4. Task_Low 被 Task_Mid 抢占，无法运行，无法释放锁
+5. Task_High 无限等待 → **优先级反转**
+
+## 解决
+
+使用 FreeRTOS 互斥量代替二值信号量：
+
+\`\`\`c
+// 错误：用二值信号量
+xSemaphoreCreateBinary();
+
+// 正确：用互斥量（支持优先级继承）
+xSemaphoreCreateMutex();
+\`\`\`
+
+FreeRTOS 互斥量内置**优先级继承**机制：持有锁的低优先级任务临时提升到等待者的优先级。
+
+## 效果
+
+Task_High 最大响应延迟从 320ms 降到 5ms 以内。
+
+> 注意：优先级继承只能解决反转问题，不能解决死锁。`,
+      category: '项目分析',
+      tags: ['FreeRTOS', '实时系统', '优先级反转'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      pinned: false
+    }
+  ];
+
+  savePosts(samples);
+}
+
+// ===== 渲染个人信息卡片 =====
+function renderProfileCard() {
+  const container = document.getElementById('profileCard');
+  if (!container) return;
+  const p = ensureProfile();
+  const posts = getPosts();
+  const categories = new Set(posts.map(p => p.category)).size;
+  const tags = new Set(posts.flatMap(p => p.tags)).size;
+
+  const initDateStr = localStorage.getItem(INIT_KEY) === 'true'
+    ? (posts.length > 0 ? posts[posts.length - 1].createdAt : new Date().toISOString())
+    : new Date().toISOString();
+  const days = Math.max(1, Math.floor((Date.now() - new Date(initDateStr).getTime()) / 86400000));
+
+  const avatarHtml = p.avatar
+    ? `<img src="${escapeHtml(p.avatar)}" alt="头像" onerror="this.parentElement.textContent='!'; this.remove();">`
+    : '!';
+
+  // 访客可点击查看详情
+  const clickAttr = !isAdmin() ? 'onclick="openProfileDetail()" style="cursor:pointer;"' : '';
+
+  container.innerHTML = `
+    <div class="profile-card" ${clickAttr}>
+      <div class="profile-avatar">${avatarHtml}</div>
+      <div class="profile-info">
+        <div class="nickname">${escapeHtml(p.nickname)}</div>
+        <div class="bio">${escapeHtml(p.bio)}</div>
+        <div class="profile-stats">
+          <div class="stat"><span class="value">${days}</span><span class="label">天</span></div>
+          <div class="stat"><span class="value">${posts.length}</span><span class="label">篇文章</span></div>
+          <div class="stat"><span class="value">${categories}</span><span class="label">个分类</span></div>
+          <div class="stat"><span class="value">${tags}</span><span class="label">个标签</span></div>
+        </div>
+        <div class="profile-links">
+          ${p.github ? `<a href="${formatGithubUrl(p.github)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">GitHub</a>` : ''}
+          ${p.email ? `<a href="mailto:${escapeHtml(p.email)}" onclick="event.stopPropagation()">邮箱</a>` : ''}
+          ${p.bilibili ? `<a href="${formatBilibiliUrl(p.bilibili)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">B站</a>` : ''}
+        </div>
+      </div>
+      ${isAdmin() ? '<button class="profile-edit" onclick="event.stopPropagation();openSettings()">编辑</button>' : ''}
+    </div>`;
+}
+
+// ===== 侧边栏迷你个人信息 =====
+function renderSidebarProfile() {
+  const container = document.getElementById('sidebarProfile');
+  if (!container) return;
+  const p = ensureProfile();
+  const avatarHtml = p.avatar
+    ? `<img src="${escapeHtml(p.avatar)}" alt="头像" onerror="this.parentElement.textContent='!'; this.remove();">`
+    : '!';
+
+  container.innerHTML = `
+    <div class="sidebar-profile">
+      <div class="sp-avatar">${avatarHtml}</div>
+      <div class="sp-nickname">${escapeHtml(p.nickname)}</div>
+      <div class="sp-bio">${escapeHtml(p.bio)}</div>
+    </div>`;
+}
+
+// ===== 分类颜色映射 =====
+function getCategoryClass(category) {
+  const map = {
+    '学习笔记': 'cat-学习笔记',
+    '问题记录': 'cat-问题记录',
+    '项目分析': 'cat-项目分析',
+    '经验总结': 'cat-经验总结',
+    '其他': 'cat-其他'
+  };
+  return map[category] || 'cat-其他';
+}
+
+// ============================================================
+// 新增功能2：阅读时长计算
+// 公式：中文约 300 字/分钟，最少 1 分钟
+// ============================================================
+function getReadTime(content) {
+  const text = content.replace(/[#*`\>\-\[\]()!|\s]/g, '');
+  return Math.max(1, Math.ceil(text.length / 300));
+}
+
+// ===== 渲染文章列表 =====
+let currentFilter = '全部';
+let currentSearchQuery = '';
+let _firstRenderDone = false;
+
+function showSkeletons(container) {
+  container.innerHTML = Array(3).fill(0).map(() => `
+    <div class="skeleton-card">
+      <div class="skeleton-line w-30 h-sm"></div>
+      <div class="skeleton-line w-60"></div>
+      <div class="skeleton-line w-80 h-sm"></div>
+      <div class="skeleton-line w-40 h-sm"></div>
+    </div>
+  `).join('');
+}
+
+function renderPosts() {
+  const posts = getPosts();
+  const container = document.getElementById('postList');
+  if (!container) return;
+
+  // 首次加载显示骨架屏
+  if (!_firstRenderDone && posts.length > 0) {
+    showSkeletons(container);
+    _firstRenderDone = true;
+    requestAnimationFrame(() => {
+      setTimeout(() => renderPosts(), 400);
+    });
+    return;
+  }
+
+  // 先按分类筛选
+  let filtered = currentFilter === '全部'
+    ? posts
+    : posts.filter(p => p.category === currentFilter);
+
+  // 再按搜索词过滤（新增功能1）
+  if (currentSearchQuery) {
+    const q = currentSearchQuery.toLowerCase();
+    filtered = filtered.filter(p => {
+      const titleMatch = p.title.toLowerCase().includes(q);
+      const plainContent = p.content.replace(/[#*`\>\-\[\]()!|]/g, '').replace(/\s+/g, ' ');
+      const contentMatch = plainContent.toLowerCase().includes(q);
+      return titleMatch || contentMatch;
+    });
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">${currentSearchQuery ? '搜索无结果' : (posts.length === 0 ? '还没有文章' : '没有找到')}</div>
+        <h3>${currentSearchQuery ? '没有匹配的文章' : (posts.length === 0 ? '还没有文章' : '没有找到相关文章')}</h3>
+        <p>${currentSearchQuery ? '换个关键词试试' : (posts.length === 0 ? '点击右上角「写文章」开始记录吧' : '换个分类试试')}</p>
+        ${posts.length === 0 && !currentSearchQuery ? '<button class="btn-primary" onclick="location.href=\'editor.html\'">写第一篇文章</button>' : ''}
+      </div>`;
+    return;
+  }
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+  container.innerHTML = sorted.map(p => `
+    <div class="post-card ${getCategoryClass(p.category)}" onclick="openPost(${p.id})">
+      <span class="ink-stain" style="right:${inkPos(p.id)}%;bottom:${inkPos(p.id+1)}%;transform:rotate(${inkRot(p.id)}deg);">${inkChar(p.id)}</span>
+      <div class="meta">
+        <span class="category">${p.category}</span>
+        ${p.pinned ? '<span class="pinned">置顶</span>' : ''}
+        <span class="divider">|</span>
+        <span class="date">${formatDate(p.createdAt)}</span>
+        <span class="read-time">约${getReadTime(p.content)}分钟</span>
+      </div>
+      <h2>${highlightSearch(p.title)}</h2>
+      <div class="summary">${highlightSearch(getSummary(p.content))}</div>
+      <div class="tags">${p.tags.map(t => `<span>${escapeHtml(t)}</span>`).join('')}</div>
+      <div class="post-footer" onclick="event.stopPropagation()">
+        ${renderLikeButton(p.id)}
+        ${isAdmin() ? `
+        <div class="card-actions">
+          <button class="btn-ghost" onclick="editPost(${p.id})">编辑</button>
+          <button class="btn-ghost" style="color:var(--danger);" onclick="requestDelete(${p.id})">删除</button>
+        </div>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  observeCards();
+}
+
+function getSummary(content) {
+  const text = content.replace(/[#*`\>\-\[\]()!|]/g, '').replace(/\s+/g, ' ').trim();
+  return text.substring(0, 150) + (text.length > 150 ? '...' : '');
+}
+
+// 搜索高亮辅助
+function highlightSearch(text) {
+  if (!currentSearchQuery) return escapeHtml(text);
+  const escaped = escapeHtml(text);
+  const q = currentSearchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const html = escaped.replace(new RegExp(`(${q})`, 'gi'), '<mark class="search-mark">$1</mark>');
+  return html;
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ===== 点赞系统 =====
+function getLikes() {
+  return JSON.parse(localStorage.getItem('blog_likes') || '{}');
+}
+function saveLikes(likes) {
+  localStorage.setItem('blog_likes', JSON.stringify(likes));
+}
+function getLikedPosts() {
+  return JSON.parse(localStorage.getItem('blog_liked') || '{}');
+}
+function saveLikedPosts(liked) {
+  localStorage.setItem('blog_liked', JSON.stringify(liked));
+}
+function toggleLike(postId, event) {
+  if (event) event.stopPropagation();
+  const likes = getLikes();
+  const liked = getLikedPosts();
+  if (liked[postId]) {
+    delete liked[postId];
+    likes[postId] = Math.max(0, (likes[postId] || 0) - 1);
+  } else {
+    liked[postId] = true;
+    likes[postId] = (likes[postId] || 0) + 1;
+  }
+  saveLikes(likes);
+  saveLikedPosts(liked);
+  // 更新当前页面上该文章的所有 like 按钮
+  document.querySelectorAll(`.like-btn[data-post-id="${postId}"]`).forEach(btn => {
+    const countEl = btn.querySelector('.like-count');
+    const count = likes[postId] || 0;
+    if (countEl) countEl.textContent = count || '';
+    const isNowLiked = !!liked[postId];
+    btn.classList.toggle('liked', isNowLiked);
+    // 更新 SVG 填充
+    const svg = btn.querySelector('svg');
+    if (svg) svg.setAttribute('fill', isNowLiked ? 'currentColor' : 'none');
+  });
+}
+function renderLikeButton(postId) {
+  const likes = getLikes();
+  const liked = getLikedPosts();
+  const count = likes[postId] || 0;
+  const isLiked = !!liked[postId];
+  return `<button class="like-btn ${isLiked ? 'liked' : ''}" data-post-id="${postId}" onclick="toggleLike(${postId}, event)" aria-label="点赞">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="${isLiked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span class="like-count">${count || ''}</span>
+  </button>`;
+}
+
+// ===== URL 格式化辅助 =====
+function formatGithubUrl(input) {
+  const trimmed = input.trim();
+  // 已经是完整 URL
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  // 去掉可能的 @ 前缀
+  const clean = trimmed.replace(/^@/, '');
+  return `https://github.com/${clean}`;
+}
+function formatBilibiliUrl(input) {
+  const trimmed = input.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://space.bilibili.com/${trimmed}`;
+}
+
+// 墨渍水印辅助函数
+const INK_CHARS = ['墨','印','篆','記','筆','硯','書','卷','章','跡'];
+function inkChar(id) {
+  return INK_CHARS[Math.abs(id) % INK_CHARS.length];
+}
+function inkPos(seed) {
+  return 3 + (Math.abs(seed * 7 + 3) % 18);
+}
+function inkRot(seed) {
+  return -25 + (Math.abs(seed * 13 + 5) % 50);
+}
+
+// ===== 分类筛选 =====
+function renderCategories() {
+  const container = document.getElementById('categoryFilter');
+  if (!container) return;
+  const posts = getPosts();
+  const categories = ['全部', ...new Set(posts.map(p => p.category))];
+  container.innerHTML = categories.map(c => `
+    <button class="filter-item ${c === currentFilter ? 'active' : ''}"
+            onclick="filterByCategory('${c}')">
+      ${c}
+      <span class="count">${c === '全部' ? posts.length : posts.filter(p => p.category === c).length}</span>
+    </button>
+  `).join('');
+}
+
+// ============================================================
+// 新增功能5：标签云权重 — 字号按文章数量等比缩放（min 12px max 28px）
+// ============================================================
+function renderTags() {
+  const container = document.getElementById('tagCloud');
+  if (!container) return;
+  const posts = getPosts();
+  const tagCount = {};
+  posts.forEach(p => p.tags.forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; }));
+  const sorted = Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 20);
+
+  if (sorted.length === 0) {
+    container.innerHTML = '<span style="font-size:.72rem;color:var(--text-dim);">暂无标签</span>';
+    return;
+  }
+
+  const counts = sorted.map(s => s[1]);
+  const minCount = Math.min(...counts);
+  const maxCount = Math.max(...counts);
+  const range = maxCount - minCount || 1; // 避免除0
+
+  container.innerHTML = sorted.map(([tag, count]) => {
+    // 字号等比缩放：12px ~ 28px
+    const fontSize = 12 + ((count - minCount) / range) * 16;
+    return `<span class="tag-badge" data-tag="${escapeHtml(tag)}" style="font-size:${fontSize}px;">${escapeHtml(tag)} ${count}</span>`;
+  }).join('');
+}
+
+// ===== 筛选 =====
+function filterByCategory(c) {
+  currentFilter = c;
+  document.querySelectorAll('.filter-item').forEach(el => el.classList.remove('active'));
+  const btn = [...document.querySelectorAll('.filter-item')].find(el => el.textContent.trim().startsWith(c));
+  if (btn) btn.classList.add('active');
+  renderPosts();
+}
+
+function filterByTag(tag) {
+  const posts = getPosts();
+  const filtered = posts.filter(p => p.tags.includes(tag));
+  const container = document.getElementById('postList');
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">没有找到</div><h3>没有找到标签为 "${escapeHtml(tag)}" 的文章</h3></div>`;
+    return;
+  }
+  container.innerHTML = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(p => `
+    <div class="post-card ${getCategoryClass(p.category)}" onclick="openPost(${p.id})">
+      <span class="ink-stain" style="right:${inkPos(p.id)}%;bottom:${inkPos(p.id+1)}%;transform:rotate(${inkRot(p.id)}deg);">${inkChar(p.id)}</span>
+      <div class="meta">
+        <span class="category">${p.category}</span>
+        ${p.pinned ? '<span class="pinned">置顶</span>' : ''}
+        <span class="divider">|</span>
+        <span class="date">${formatDate(p.createdAt)}</span>
+        <span class="read-time">约${getReadTime(p.content)}分钟</span>
+      </div>
+      <h2>${escapeHtml(p.title)}</h2>
+      <div class="summary">${getSummary(p.content)}</div>
+      <div class="tags">${p.tags.map(t => `<span>${escapeHtml(t)}</span>`).join('')}</div>
+    </div>
+  `).join('');
+  observeCards();
+}
+
+// ===== 需求14：代码块增强 — 行号 + 语言标签 + 复制按钮 =====
+function enhanceCodeBlocks(container) {
+  const pres = container.querySelectorAll('pre');
+  pres.forEach(pre => {
+    if (pre.parentElement.classList.contains('code-block-wrapper')) return;
+
+    const code = pre.querySelector('code');
+    const codeText = code ? code.textContent : pre.textContent;
+
+    let lang = '';
+    if (code) {
+      const classes = code.className.split(' ');
+      const langClass = classes.find(c => c.startsWith('language-'));
+      if (langClass) lang = langClass.replace('language-', '');
+    }
+
+    const lines = codeText.split('\n');
+    if (lines.length > 1 && lines[lines.length - 1].trim() === '') lines.pop();
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'code-block-wrapper';
+
+    const header = document.createElement('div');
+    header.className = 'code-block-header';
+    header.innerHTML = `
+      <span class="code-lang-tag">${lang || 'code'}</span>
+      <button class="code-copy-btn" onclick="copyCodeBlock(this)">复制</button>
+    `;
+
+    const codeBody = document.createElement('div');
+    codeBody.className = 'code-with-lines';
+    codeBody.innerHTML = lines.map((line, i) => `
+      <div class="line-row">
+        <span class="line-num">${i + 1}</span>
+        <span class="line-code">${escapeHtml(line)}</span>
+      </div>
+    `).join('');
+
+    wrapper.dataset.code = codeText;
+    wrapper.appendChild(header);
+    wrapper.appendChild(codeBody);
+    pre.replaceWith(wrapper);
+  });
+
+  if (typeof hljs !== 'undefined') {
+    container.querySelectorAll('.code-with-lines .line-code').forEach(el => {
+      const parent = el.closest('.code-block-wrapper');
+      if (parent && !parent.dataset.highlighted) {
+        parent.dataset.highlighted = '1';
+        const rawCode = parent.dataset.code || '';
+        const langTag = parent.querySelector('.code-lang-tag');
+        const lang = langTag ? langTag.textContent : '';
+        if (lang && lang !== 'code') {
+          try {
+            const result = hljs.highlight(rawCode, { language: lang, ignoreIllegals: true });
+            const lineCodes = parent.querySelectorAll('.line-code');
+            const resultLines = result.value.split('\n');
+            if (resultLines.length > 1 && resultLines[resultLines.length - 1].trim() === '') resultLines.pop();
+            lineCodes.forEach((lc, i) => {
+              if (resultLines[i] !== undefined) lc.innerHTML = resultLines[i];
+            });
+          } catch(e) { /* 高亮失败则保留原文 */ }
+        }
+      }
+    });
+  }
+}
+
+function copyCodeBlock(btn) {
+  const wrapper = btn.closest('.code-block-wrapper');
+  if (!wrapper) return;
+  const code = wrapper.dataset.code || '';
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = '已复制';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '已复制';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ============================================================
+// 新增功能7：TOC 目录生成
+// 从 post-content 的 HTML 提取 h1-h3，给标题加 id，生成目录
+// ============================================================
+function buildTOC(contentDiv) {
+  const headings = contentDiv.querySelectorAll('h1, h2, h3');
+  if (headings.length === 0) return null;
+
+  const items = [];
+  headings.forEach((h, i) => {
+    const id = 'toc-' + i;
+    h.id = id;
+    items.push({ id, level: h.tagName.toLowerCase(), text: h.textContent });
+  });
+
+  return items;
+}
+
+function renderTOC(items) {
+  if (!items || items.length === 0) return '';
+
+  const html = items.map(item => `
+    <a href="#${item.id}" class="toc-${item.level}" onclick="scrollToTOC('${item.id}');return false">${escapeHtml(item.text)}</a>
+  `).join('');
+
+  return `
+    <div class="modal-toc">
+      <div class="modal-toc-title">目录</div>
+      ${html}
+    </div>
+  `;
+}
+
+// TOC 点击跳转（带平滑滚动）
+function scrollToTOC(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// ============================================================
+// 新增功能6：上一篇/下一篇导航
+// ============================================================
+function renderPostNav(currentId) {
+  const posts = getPosts();
+  const sorted = [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const idx = sorted.findIndex(p => p.id === currentId);
+  if (idx === -1 || sorted.length <= 1) return '';
+
+  const prev = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+  const next = idx > 0 ? sorted[idx - 1] : null;
+
+  return `
+    <div class="post-nav">
+      ${prev ? `
+        <div class="post-nav-item prev-only" onclick="closeModal();openPost(${prev.id})">
+          <div class="post-nav-label">← 上一篇</div>
+          <div class="post-nav-title">${escapeHtml(prev.title)}</div>
+        </div>
+      ` : '<div></div>'}
+      ${next ? `
+        <div class="post-nav-item next-only" onclick="closeModal();openPost(${next.id})" style="text-align:right;">
+          <div class="post-nav-label">下一篇 →</div>
+          <div class="post-nav-title">${escapeHtml(next.title)}</div>
+        </div>
+      ` : '<div></div>'}
+    </div>
+  `;
+}
+
+// ===== 文章详情 Modal =====
+function openPost(id) {
+  const posts = getPosts();
+  const post = posts.find(p => p.id === id);
+  if (!post) return;
+
+  const body = document.getElementById('modalBody');
+  const html = marked.parse(post.content);
+
+  body.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;font-size:.78rem;color:var(--text-dim);">
+      <span style="background:var(--bg-subtle);padding:2px 12px;border-radius:var(--radius-full);color:var(--text-muted);">${post.category}</span>
+      <span>${formatDate(post.createdAt)}</span>
+      <span class="read-time">约${getReadTime(post.content)}分钟</span>
+      ${post.tags.map(t => `<span style="color:var(--text-dim);">${escapeHtml(t)}</span>`).join(' ')}
+    </div>
+    <h1 style="font-family:var(--font-serif);font-size:1.55rem;font-weight:700;margin-bottom:20px;">${escapeHtml(post.title)}</h1>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;">${renderLikeButton(post.id)}
+      <button class="copy-link-btn" data-post-id="${post.id}" onclick="copyPostLink(${post.id})" aria-label="复制链接">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> 复制链接
+      </button>
+    </div>
+    <div class="post-content">${html}</div>
+  `;
+
+  // 代码块增强
+  const contentDiv = body.querySelector('.post-content');
+  if (contentDiv) {
+    enhanceCodeBlocks(contentDiv);
+
+    // 新增功能7：TOC 目录
+    const tocItems = buildTOC(contentDiv);
+    const tocHTML = renderTOC(tocItems);
+    if (tocHTML) {
+      contentDiv.insertAdjacentHTML('afterbegin', tocHTML);
+    }
+
+    // 新增功能6：上/下篇导航
+    const navHTML = renderPostNav(id);
+    if (navHTML) {
+      contentDiv.insertAdjacentHTML('beforeend', navHTML);
+    }
+  }
+
+  document.getElementById('postModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  if (typeof hljs !== 'undefined') {
+    body.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+  }
+
+  // KaTeX 数学公式渲染
+  if (typeof renderMathInElement !== 'undefined') {
+    try {
+      renderMathInElement(body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false},
+          {left: '\\[', right: '\\]', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ],
+        throwOnError: false
+      });
+    } catch(e) {}
+  }
+}
+
+async function copyPostLink(postId) {
+  const url = `${location.origin}${location.pathname}?post=${postId}`;
+  const btn = document.querySelector(`.copy-link-btn[data-post-id="${postId}"]`);
+  const originalHTML = btn ? btn.innerHTML : '';
+  try {
+    await navigator.clipboard.writeText(url);
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  // 按钮即时反馈
+  if (btn) {
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 已复制';
+    btn.style.borderColor = '#10B981';
+    btn.style.color = '#10B981';
+    setTimeout(() => {
+      btn.innerHTML = originalHTML;
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 2000);
+  }
+  showToast('链接已复制');
+}
+
+function closeModal() {
+  document.getElementById('postModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ===== 个人信息详情弹窗（访客只读） =====
+async function openProfileDetail() {
+  // 优先从服务端获取最新数据
+  let p = ensureProfile();
+  try {
+    const res = await fetch('/api/profile');
+    if (res.ok) { p = await res.json(); saveProfile(p); }
+  } catch(e) {}
+
+  // 也尝试从服务端获取文章来统计
+  let posts = getPosts();
+  try {
+    const res = await fetch('/api/posts');
+    if (res.ok) { posts = await res.json(); }
+  } catch(e) {}
+  const avatarHtml = p.avatar
+    ? `<img src="${escapeHtml(p.avatar)}" alt="头像" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--border);">`
+    : `<div style="width:80px;height:80px;border-radius:50%;background:var(--bg-subtle);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--text-dim);border:2px solid var(--border);">!</div>`;
+
+  const tagSet = new Set(posts.flatMap(p => p.tags));
+  const catSet = new Set(posts.map(p => p.category));
+
+  document.getElementById('profileDetailBody').innerHTML = `
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="display:flex;justify-content:center;margin-bottom:12px;">${avatarHtml}</div>
+      <h2 style="font-family:var(--font-serif);font-size:1.3rem;font-weight:700;color:var(--text);margin:0;">${escapeHtml(p.nickname)}</h2>
+      <p style="font-size:.86rem;color:var(--text-muted);margin:4px 0 0;">${escapeHtml(p.bio)}</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+      <div style="background:var(--bg-subtle);border-radius:var(--radius-sm);padding:12px;text-align:center;">
+        <div style="font-family:var(--font-serif);font-size:1.4rem;font-weight:700;color:var(--seal);">${posts.length}</div>
+        <div style="font-size:.72rem;color:var(--text-dim);">文章</div>
+      </div>
+      <div style="background:var(--bg-subtle);border-radius:var(--radius-sm);padding:12px;text-align:center;">
+        <div style="font-family:var(--font-serif);font-size:1.4rem;font-weight:700;color:var(--seal);">${tagSet.size}</div>
+        <div style="font-size:.72rem;color:var(--text-dim);">标签</div>
+      </div>
+    </div>
+
+    ${catSet.size > 0 ? `
+    <div style="margin-bottom:14px;">
+      <div style="font-size:.72rem;font-weight:600;color:var(--text-dim);margin-bottom:6px;">写作分类</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${[...catSet].map(c => `<span style="background:var(--bg-subtle);padding:2px 12px;border-radius:var(--radius-full);font-size:.76rem;color:var(--text-muted);">${escapeHtml(c)}</span>`).join('')}
+   
+
+[… truncated 25606 chars …]
